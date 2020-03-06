@@ -13,11 +13,8 @@ import ru.otus.homework.model.Genre;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Collections;
-import java.util.Scanner;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
 
 @DisplayName("Сервис для ввода/вывода данных")
 @SpringBootTest
@@ -34,7 +31,7 @@ public class CommunicationServiceImplTest {
     }
 
     @Autowired
-    CommunicationService communicationService;
+    private CommunicationService communicationService;
 
     @SneakyThrows
     @Test

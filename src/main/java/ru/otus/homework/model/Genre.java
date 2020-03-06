@@ -27,13 +27,6 @@ public class Genre {
 
     @Override
     public String toString() {
-        StringBuilder stringBuilder = new StringBuilder(
-                "Genre{" + "id=" + id + ", genre='" + genre + '\''
-        );
-        books.forEach(book -> stringBuilder.append(book.getFullName()));
-
-        return stringBuilder
-                .append('}')
-                .toString();
+        return "Genre{" + "id=" + id + ", genre='" + genre + "\'}";
     }
 }

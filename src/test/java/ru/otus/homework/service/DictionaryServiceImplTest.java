@@ -21,38 +21,33 @@ public class DictionaryServiceImplTest {
         @Bean
         public DictionaryService dictionaryService(
                 AuthorRepositoryJpa authorRepositoryJpa,
-                GenreRepositoryJpa genreRepositoryJpa,
-                CommunicationService communicationService
+                GenreRepositoryJpa genreRepositoryJpa
         ) {
             return new DictionaryServiceImpl(
                     authorRepositoryJpa,
-                    genreRepositoryJpa,
-                    communicationService
+                    genreRepositoryJpa
             );
         }
     }
 
     @MockBean
-    AuthorRepositoryJpa authorRepositoryJpa;
+    private AuthorRepositoryJpa authorRepositoryJpa;
 
     @MockBean
-    GenreRepositoryJpa genreRepositoryJpa;
-
-    @MockBean
-    CommunicationService communicationService;
+    private GenreRepositoryJpa genreRepositoryJpa;
 
     @Autowired
-    DictionaryService dictionaryService;
+    private DictionaryService dictionaryService;
 
     @Test
     void showAuthors() {
-        dictionaryService.showAuthors();
+        dictionaryService.getAuthors();
         verify(authorRepositoryJpa, times(1)).findAll();
     }
 
     @Test
     void getBookGenres() {
-        dictionaryService.showBookGenres();
+        dictionaryService.getGenres();
         verify(genreRepositoryJpa, times(1)).findAll();
     }
 }

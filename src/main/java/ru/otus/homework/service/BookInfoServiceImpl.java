@@ -1,193 +1,120 @@
 package ru.otus.homework.service;
 
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-import ru.otus.homework.repository.AuthorRepositoryJpa;
-import ru.otus.homework.repository.BookInfoRepositoryJpa;
 import ru.otus.homework.model.Author;
 import ru.otus.homework.model.Book;
 import ru.otus.homework.model.Genre;
-import ru.otus.homework.repository.GenreRepositoryJpa;
+import ru.otus.homework.repository.BookInfoRepositoryJpa;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class BookInfoServiceImpl implements BookInfoService {
-    private final CommunicationService communicationService;
     private final BookInfoRepositoryJpa bookInfoRepositoryJpa;
-    private final AuthorRepositoryJpa authorRepositoryJpa;
-    private final GenreRepositoryJpa genreRepositoryJpa;
+    private final DictionaryService dictionaryService;
 
     public BookInfoServiceImpl(
-            CommunicationService communicationService,
-            BookInfoRepositoryJpa bookInfoRepositoryJpa,
-            AuthorRepositoryJpa authorRepositoryJpa,
-            GenreRepositoryJpa genreRepositoryJpa
+            DictionaryService dictionaryService,
+            BookInfoRepositoryJpa bookInfoRepositoryJpa
     ) {
-        this.communicationService = communicationService;
         this.bookInfoRepositoryJpa = bookInfoRepositoryJpa;
-        this.authorRepositoryJpa = authorRepositoryJpa;
-        this.genreRepositoryJpa = genreRepositoryJpa;
+        this.dictionaryService = dictionaryService;
     }
 
     @SneakyThrows
     @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void insertBook() {
-        String title = communicationService.getUserInputString(
-                "Введите наименование книги",
-                "Некорректное наименование! Введите наименование еще раз",
-                "[^.]+"
-        );
-
-        List<Author> authorList = getAuthors();
-
-        Genre genre = getGenre();
-
-        String description = communicationService.getUserInputString(
-                "Введите описание книги",
-                "Некорректное описание! Введите описание еще раз",
-                "[^.]+"
-        );
-
-        String message;
+    public Book insertBook(String title, String authors, String genreName, String description) {
+        List<Author> authorList = formAuthorList(authors);
+        Genre genre = dictionaryService.getGenreByName(genreName);
         try {
-            Book newBook = bookInfoRepositoryJpa.save(
-                    new Book(0L, title, genre, authorList, description)
-            );
-            message = "inserted: " + newBook.toString();
+            Book newBook = new Book(0L, title, genre, authorList, description);
+            return bookInfoRepositoryJpa.save(newBook);
         } catch (Exception e) {
-            message = e.getMessage();
+            log.error("error on inserting book", e);
         }
-        communicationService.showMessage(message);
-    }
-
-    private Genre getGenre() throws UnsupportedEncodingException {
-        List<Genre> genres = genreRepositoryJpa.findAll();
-        if (genres.size() > 0) {
-            List<String> genresString = genres.stream()
-                    .map(Genre::getGenre)
-                    .collect(Collectors.toList());
-            String userGenre = communicationService.getUserInputString(
-                    "Введите жанр книги",
-                    "Некорректный жанр книги! Введите жанр еще раз",
-                    genresString
-            );
-
-            return genres.stream()
-                    .filter(g -> g.getGenre().toLowerCase().equals(userGenre.toLowerCase()))
-                    .findAny()
-                    .orElse(null);
-        }
-
         return null;
     }
 
-    private List<Author> getAuthors() throws UnsupportedEncodingException {
-        String authors = communicationService.getUserInputString(
-                "Введите авторов книги (разделитель ';')",
-                "Некорректный автор! Введите авторов еще раз",
-                "[^.]+"
-        );
+    @SneakyThrows
+    @Override
+    public Book updateTitleBookById(long bookId, String newBookTitle) {
+        try {
+            Book updatedBook = getBookById(bookId);
+            if (updatedBook != null) {
+                updatedBook.setFullName(newBookTitle);
+                return bookInfoRepositoryJpa.save(updatedBook);
+            }
+        } catch (Exception e) {
+            log.error("error on updating book", e);
+        }
+        return null;
+    }
 
-        List<Author> authorList = new ArrayList<>();
-        if (authors != null) {
-            Arrays.stream(authors.split(";"))
+    @SneakyThrows
+    @Override
+    public boolean deleteBookById(long bookId) {
+        try {
+            Book book = getBookById(bookId);
+            if (book != null) {
+                bookInfoRepositoryJpa.delete(book);
+                return true;
+            }
+        } catch (Exception e) {
+            log.error("error on deleting book", e);
+        }
+        return false;
+    }
+
+    @SneakyThrows
+    @Override
+    public List<Book> getAllBooks() {
+        return bookInfoRepositoryJpa.findAll();
+    }
+
+    @SneakyThrows
+    @Override
+    public Book getBookById(long bookId) {
+        Optional<Book> optionalBook = bookInfoRepositoryJpa.findById(bookId);
+        return optionalBook.orElse(null);
+    }
+
+    private List<Author> formAuthorList(String authorFullNames) {
+        List<Author> authors = dictionaryService.getAuthors();
+
+        List<Author> userAuthorList = new ArrayList<>();
+        if (authorFullNames != null) {
+            Arrays.stream(authorFullNames.split(";"))
                     .forEach(
-                            authorName -> {
-                                Author author = authorRepositoryJpa.findByFullName(authorName);
+                            a -> {
+                                Author author = getAuthorInRepository(a, authors);
                                 if (author == null) {
-                                    authorList.add(
-                                            authorRepositoryJpa.save(
-                                                    new Author(0L, authorName, "", null)
-                                            )
+                                    Author newAuthor = dictionaryService.saveAuthor(
+                                            new Author(0L, a, "", null)
                                     );
+                                    userAuthorList.add(newAuthor);
                                 } else {
-                                    authorList.add(author);
+                                    userAuthorList.add(author);
                                 }
                             }
                     );
         }
-        return authorList;
+        return userAuthorList;
     }
 
-    @SneakyThrows
-    @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void updateTitleBookById() {
-        long id = Long.parseLong(
-                communicationService.getUserInputString(
-                        "Введите идентификатор книги",
-                        "Некорректный идентификатор! Введите еще раз",
-                        "[^d]+"
-                )
-        );
-
-        String title = communicationService.getUserInputString(
-                "Введите наименование книги",
-                "Некорректное наименование! Введите еще раз",
-                "[^.]+"
-        );
-
-        String message;
-        try {
-            Optional<Book> updatedBook = bookInfoRepositoryJpa.findById(id);
-            if (updatedBook.isPresent()) {
-                Book book = updatedBook.get();
-                book.setFullName(title);
-                bookInfoRepositoryJpa.save(book);
-                message = "updated book with id = " + book.getId();
-            } else {
-                message = "nothing updated";
+    private Author getAuthorInRepository(String authorFullName, List<Author> authors) {
+        Author resultAuthor = null;
+        for (Author author: authors) {
+            if (authorFullName.toLowerCase().equals(author.getFullName().toLowerCase())) {
+                resultAuthor = author;
+                break;
             }
-        } catch (Exception e) {
-            message = e.getMessage();
         }
-
-        communicationService.showMessage(message);
-    }
-
-    @SneakyThrows
-    @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void deleteBookById() {
-        long id = Long.parseLong(
-                communicationService.getUserInputString(
-                        "Введите идентификатор книги",
-                        "Некорректный идентификатор! Введите еще раз",
-                        "[^d]+"
-                )
-        );
-
-        String message;
-        try {
-            Optional<Book> book = bookInfoRepositoryJpa.findById(id);
-            if (book.isPresent()) {
-                bookInfoRepositoryJpa.delete(book.get());
-                message = "deleted success";
-            } else {
-                message = "nothing deleted";
-            }
-        } catch (Exception e) {
-            message = e.getMessage();
-        }
-        communicationService.showMessage(message);
-    }
-
-    @SneakyThrows
-    @Override
-    @Transactional(readOnly = true)
-    public void getAllBooks() {
-        List<Book> bookList = bookInfoRepositoryJpa.findAll();
-        for (Book book : bookList) {
-            communicationService.showMessage(book.toString());
-        }
+        return resultAuthor;
     }
 }

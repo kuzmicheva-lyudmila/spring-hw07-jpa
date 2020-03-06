@@ -10,9 +10,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import ru.otus.homework.model.Book;
 import ru.otus.homework.model.Post;
-import ru.otus.homework.repository.AuthorRepositoryJpa;
-import ru.otus.homework.repository.BookInfoRepositoryJpa;
-import ru.otus.homework.repository.GenreRepositoryJpa;
 import ru.otus.homework.repository.PostRepositoryJpa;
 
 import java.util.List;
@@ -26,16 +23,17 @@ import static org.mockito.Mockito.*;
 @SpringBootTest
 class PostServiceImplTest {
 
+    private static final long BOOK_ID = 1L;
+    private static final String POST_DESCRIPTION = "description";
+
     @Configuration
     static class PostServiceImplContextConfiguration {
         @Bean
         public PostService postService(
-                CommunicationService communicationService,
-                BookInfoRepositoryJpa bookInfoRepositoryJpa,
+                BookInfoService bookInfoRepositoryJpa,
                 PostRepositoryJpa postRepositoryJpa
         ) {
             return new PostServiceImpl(
-                    communicationService,
                     bookInfoRepositoryJpa,
                     postRepositoryJpa
             );
@@ -43,53 +41,43 @@ class PostServiceImplTest {
     }
 
     @MockBean
-    BookInfoRepositoryJpa bookInfoRepositoryJpa;
+    private BookInfoService bookInfoService;
 
     @MockBean
-    PostRepositoryJpa postRepositoryJpa;
-
-    @MockBean
-    CommunicationService communicationService;
+    private PostRepositoryJpa postRepositoryJpa;
 
     @Autowired
-    PostService postService;
+    private PostService postService;
 
     @SneakyThrows
     @Test
     void insertPost() {
-        when(communicationService.getUserInputString(any(), any(), (String) any()))
-                .thenReturn(String.valueOf(1));
-        when(bookInfoRepositoryJpa.findById(1L)).thenReturn(Optional.of(new Book()));
+        when(bookInfoService.getBookById(BOOK_ID)).thenReturn(new Book());
 
-        postService.insertPostByBook();
-        verify(bookInfoRepositoryJpa, times(1)).findById(1L);
+        postService.insertPostByBook(BOOK_ID, POST_DESCRIPTION);
+        verify(bookInfoService, times(1)).getBookById(BOOK_ID);
         verify(postRepositoryJpa, times(1)).save(any());
     }
 
     @SneakyThrows
     @Test
     void deleteBookById() {
-        when(communicationService.getUserInputString(any(), any(), (String) any()))
-                .thenReturn(String.valueOf(1));
-
         Book book = new Book();
-        when(bookInfoRepositoryJpa.findById(1L)).thenReturn(Optional.of(book));
+        when(bookInfoService.getBookById(BOOK_ID)).thenReturn(book);
         when(postRepositoryJpa.findByBook(book)).thenReturn(List.of(new Post()));
-        postService.deletePostsByBook();
+        postService.deletePostsByBook(BOOK_ID);
 
-        verify(bookInfoRepositoryJpa, times(1)).findById(1L);
+        verify(bookInfoService, times(1)).getBookById(BOOK_ID);
         verify(postRepositoryJpa, times(1)).delete(any(Post.class));
     }
 
     @SneakyThrows
     @Test
     void getAllBooks() {
-        when(communicationService.getUserInputString(any(), any(), (String) any()))
-                .thenReturn(String.valueOf(1));
-        when(bookInfoRepositoryJpa.findById(anyLong())).thenReturn(Optional.of(new Book()));
+        when(bookInfoService.getBookById(anyLong())).thenReturn(new Book());
 
-        postService.getPostsByBook();
-        verify(bookInfoRepositoryJpa, times(1)).findById(1L);
+        postService.getPostsByBook(BOOK_ID);
+        verify(bookInfoService, times(1)).getBookById(BOOK_ID);
         verify(postRepositoryJpa, times(1)).findByBook(any());
     }
 }

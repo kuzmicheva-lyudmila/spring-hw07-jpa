@@ -58,4 +58,21 @@ public class CommunicationServiceImpl implements CommunicationService {
         PrintStream printStream = new PrintStream(System.out, true, CHARSET_NAME);
         printStream.println(messageString);
     }
+
+    @Override
+    public void showResultMessage(boolean isSuccess, String msgSuccess, String msgError)
+            throws UnsupportedEncodingException {
+        if (isSuccess) {
+            showMessage(msgSuccess);
+        } else {
+            showMessage(msgError);
+        }
+    }
+
+    @Override
+    public  <T> void showResultMessageList(List<T> elements) throws UnsupportedEncodingException {
+        for (T element : elements) {
+            showMessage(element.toString());
+        }
+    }
 }

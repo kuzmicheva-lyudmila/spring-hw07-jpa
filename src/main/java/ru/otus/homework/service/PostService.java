@@ -1,9 +1,11 @@
 package ru.otus.homework.service;
 
-import java.io.UnsupportedEncodingException;
+import ru.otus.homework.model.Post;
+
+import java.util.List;
 
 public interface PostService {
-    void insertPostByBook() throws UnsupportedEncodingException;
-    void deletePostsByBook();
-    void getPostsByBook();
+    Post insertPostByBook(long bookId, String description);
+    boolean deletePostsByBook(long bookId);
+    List<Post> getPostsByBook(long bookId);
 }

@@ -9,9 +9,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import ru.otus.homework.model.Book;
-import ru.otus.homework.repository.AuthorRepositoryJpa;
 import ru.otus.homework.repository.BookInfoRepositoryJpa;
-import ru.otus.homework.repository.GenreRepositoryJpa;
 
 import java.util.Optional;
 
@@ -22,64 +20,57 @@ import static org.mockito.Mockito.*;
 @SpringBootTest
 class BookInfoServiceImplTest {
 
+    private static final long BOOK_ID = 1L;
+    private static final String BOOK_TITLE = "title";
+    private static final String BOOK_NEW_TITLE = "new_title";
+    private static final String BOOK_AUTHORS = "author";
+    private static final String BOOK_GENRE = "genre";
+    private static final String BOOK_DESCRIPTION = "description";
+
     @Configuration
     static class BookInfoServiceImplContextConfiguration {
         @Bean
         public BookInfoService bookInfoService(
-                CommunicationService communicationService,
-                BookInfoRepositoryJpa bookInfoRepositoryJpa,
-                AuthorRepositoryJpa authorRepositoryJpa,
-                GenreRepositoryJpa genreRepositoryJpa
+                DictionaryService dictionaryService,
+                BookInfoRepositoryJpa bookInfoRepositoryJpa
         ) {
             return new BookInfoServiceImpl(
-                    communicationService,
-                    bookInfoRepositoryJpa,
-                    authorRepositoryJpa,
-                    genreRepositoryJpa
+                    dictionaryService,
+                    bookInfoRepositoryJpa
             );
         }
     }
 
     @MockBean
-    BookInfoRepositoryJpa bookInfoRepositoryJpa;
+    private BookInfoRepositoryJpa bookInfoRepositoryJpa;
 
     @MockBean
-    AuthorRepositoryJpa authorRepositoryJpa;
-
-    @MockBean
-    GenreRepositoryJpa genreRepositoryJpa;
-
-    @MockBean
-    CommunicationService communicationService;
+    private DictionaryService dictionaryService;
 
     @Autowired
-    BookInfoService bookInfoService;
+    private BookInfoService bookInfoService;
 
     @Test
     void insertBook() {
-        bookInfoService.insertBook();
+        bookInfoService.insertBook(BOOK_TITLE, BOOK_AUTHORS, BOOK_GENRE, BOOK_DESCRIPTION);
         verify(bookInfoRepositoryJpa, times(1)).save(any());
     }
 
     @SneakyThrows
     @Test
     void updateTitleBookById() {
-        when(communicationService.getUserInputString(any(), any(), (String) any()))
-                .thenReturn(String.valueOf(1));
         when(bookInfoRepositoryJpa.findById(anyLong())).thenReturn(Optional.of(new Book()));
-        bookInfoService.updateTitleBookById();
+        bookInfoService.updateTitleBookById(BOOK_ID, BOOK_NEW_TITLE);
 
-        verify(bookInfoRepositoryJpa, times(1)).findById(1L);
+        verify(bookInfoRepositoryJpa, times(1)).findById(BOOK_ID);
         verify(bookInfoRepositoryJpa, times(1)).save(any());
     }
 
     @SneakyThrows
     @Test
     void deleteBookById() {
-        when(communicationService.getUserInputString(any(), any(), (String) any()))
-                .thenReturn(String.valueOf(1));
         when(bookInfoRepositoryJpa.findById(anyLong())).thenReturn(Optional.of(new Book()));
-        bookInfoService.deleteBookById();
+        bookInfoService.deleteBookById(BOOK_ID);
 
         verify(bookInfoRepositoryJpa, times(1)).delete(any());
     }
