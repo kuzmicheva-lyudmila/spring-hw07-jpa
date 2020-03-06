@@ -92,7 +92,7 @@ public class BookInfoServiceImpl implements BookInfoService {
             Arrays.stream(authorFullNames.split(";"))
                     .forEach(
                             a -> {
-                                Author author = getAuthorInRepository(a, authors);
+                                Author author = findAuthorInRepository(a, authors);
                                 if (author == null) {
                                     Author newAuthor = dictionaryService.saveAuthor(
                                             new Author(0L, a, "", null)
@@ -107,7 +107,7 @@ public class BookInfoServiceImpl implements BookInfoService {
         return userAuthorList;
     }
 
-    private Author getAuthorInRepository(String authorFullName, List<Author> authors) {
+    private Author findAuthorInRepository(String authorFullName, List<Author> authors) {
         Author resultAuthor = null;
         for (Author author: authors) {
             if (authorFullName.toLowerCase().equals(author.getFullName().toLowerCase())) {
