@@ -5,9 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -20,13 +18,13 @@ public class Genre {
     private Long id;
 
     @Column
-    private String genre;
+    private String name;
 
-    @OneToMany(mappedBy = "genre", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "name", fetch = FetchType.LAZY)
     public List<Book> books;
 
     @Override
     public String toString() {
-        return "Genre{" + "id=" + id + ", genre='" + genre + "\'}";
+        return "Genre{" + "id=" + id + ", name='" + name + "\'}";
     }
 }
