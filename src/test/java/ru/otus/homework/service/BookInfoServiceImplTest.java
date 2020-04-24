@@ -24,7 +24,7 @@ class BookInfoServiceImplTest {
     private static final String BOOK_TITLE = "title";
     private static final String BOOK_NEW_TITLE = "new_title";
     private static final String BOOK_AUTHORS = "author";
-    private static final String BOOK_GENRE = "genre";
+    private static final String BOOK_GENRE = "name";
     private static final String BOOK_DESCRIPTION = "description";
 
     @Configuration

@@ -16,6 +16,10 @@ import java.util.Optional;
 @Service
 @Slf4j
 public class BookInfoServiceImpl implements BookInfoService {
+    private static final String ERROR_ON_UPDATING_BOOK = "error on updating book";
+    private static final String ERROR_ON_INSERTING_BOOK = "error on inserting book";
+    private static final String ERROR_ON_DELETING_BOOK = "error on deleting book";
+
     private final BookInfoRepositoryJpa bookInfoRepositoryJpa;
     private final DictionaryService dictionaryService;
 
@@ -36,7 +40,7 @@ public class BookInfoServiceImpl implements BookInfoService {
             Book newBook = new Book(0L, title, genre, authorList, description);
             return bookInfoRepositoryJpa.save(newBook);
         } catch (Exception e) {
-            log.error("error on inserting book", e);
+            log.error(ERROR_ON_INSERTING_BOOK, e);
         }
         return null;
     }
@@ -44,14 +48,24 @@ public class BookInfoServiceImpl implements BookInfoService {
     @SneakyThrows
     @Override
     public Book updateTitleBookById(long bookId, String newBookTitle) {
-        try {
-            Book updatedBook = getBookById(bookId);
-            if (updatedBook != null) {
-                updatedBook.setFullName(newBookTitle);
-                return bookInfoRepositoryJpa.save(updatedBook);
-            }
-        } catch (Exception e) {
-            log.error("error on updating book", e);
+        Book updatedBook = getBookById(bookId);
+        if (updatedBook != null) {
+            updatedBook.setFullName(newBookTitle);
+            return updateBook(updatedBook);
+        }
+        return null;
+    }
+
+    @Override
+    public Book updateBookById(long bookId, String bookTitle, String authors, Genre genre, String description) {
+        List<Author> authorList = formAuthorList(authors);
+        Book updatedBook = getBookById(bookId);
+        if (updatedBook != null) {
+            updatedBook.setFullName(bookTitle);
+            updatedBook.setAuthors(authorList);
+            updatedBook.setGenre(genre);
+            updatedBook.setBookDescription(description);
+            return updateBook(updatedBook);
         }
         return null;
     }
@@ -66,7 +80,7 @@ public class BookInfoServiceImpl implements BookInfoService {
                 return true;
             }
         } catch (Exception e) {
-            log.error("error on deleting book", e);
+            log.error(ERROR_ON_DELETING_BOOK, e);
         }
         return false;
     }
@@ -110,11 +124,20 @@ public class BookInfoServiceImpl implements BookInfoService {
     private Author findAuthorInRepository(String authorFullName, List<Author> authors) {
         Author resultAuthor = null;
         for (Author author: authors) {
-            if (authorFullName.toLowerCase().equals(author.getFullName().toLowerCase())) {
+            if (authorFullName.equalsIgnoreCase(author.getFullName())) {
                 resultAuthor = author;
                 break;
             }
         }
         return resultAuthor;
+    }
+
+    private Book updateBook(Book book) {
+        try {
+            return bookInfoRepositoryJpa.save(book);
+        } catch (Exception e) {
+            log.error(ERROR_ON_UPDATING_BOOK, e);
+        }
+        return null;
     }
 }

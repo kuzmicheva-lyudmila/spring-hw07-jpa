@@ -42,7 +42,7 @@ public class CommunicationServiceImplTest {
         System.setIn(in);
 
         assertThat(communicationService.getUserInputString(
-                Strings.EMPTY, Strings.EMPTY, Collections.singletonList(bookGenre.getGenre())
-        )).isEqualTo(bookGenre.getGenre());
+                Strings.EMPTY, Strings.EMPTY, Collections.singletonList(bookGenre.getName())
+        )).isEqualTo(bookGenre.getName());
     }
 }

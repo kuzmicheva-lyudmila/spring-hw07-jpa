@@ -7,6 +7,7 @@ import ru.otus.homework.model.Genre;
 import ru.otus.homework.repository.GenreRepositoryJpa;
 import ru.otus.homework.repository.AuthorRepositoryJpa;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,12 +47,12 @@ public class DictionaryServiceImpl implements DictionaryService {
     @Override
     public List<String> getGenreNames() {
         List<Genre> genres = getGenres();
-        if (genres.size() > 0) {
+        if (!genres.isEmpty()) {
             return genres.stream()
-                    .map(Genre::getGenre)
+                    .map(Genre::getName)
                     .collect(Collectors.toList());
         }
-        return null;
+        return Collections.emptyList();
     }
 
     @SneakyThrows
