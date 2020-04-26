@@ -18,13 +18,13 @@ public class Genre {
     private Long id;
 
     @Column
-    private String name;
+    private String genre;
 
-    @OneToMany(mappedBy = "name", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "genre", fetch = FetchType.LAZY)
     public List<Book> books;
 
     @Override
     public String toString() {
-        return "Genre{" + "id=" + id + ", name='" + name + "\'}";
+        return "Genre{" + "id=" + id + ", genre='" + genre + "\'}";
     }
 }

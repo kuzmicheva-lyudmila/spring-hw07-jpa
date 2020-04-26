@@ -49,7 +49,7 @@ public class DictionaryServiceImpl implements DictionaryService {
         List<Genre> genres = getGenres();
         if (!genres.isEmpty()) {
             return genres.stream()
-                    .map(Genre::getName)
+                    .map(Genre::getGenre)
                     .collect(Collectors.toList());
         }
         return Collections.emptyList();

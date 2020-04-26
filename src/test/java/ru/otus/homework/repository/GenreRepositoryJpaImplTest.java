@@ -31,6 +31,6 @@ public class GenreRepositoryJpaImplTest {
         val genres = repositoryJpa.findAll();
 
         assertThat(genres).isNotNull().hasSize(EXPECTED_NUMBER_OF_GENRES)
-                .allMatch(g -> !g.getName().equals(""));
+                .allMatch(g -> !g.getGenre().equals(""));
     }
 }
