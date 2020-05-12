@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import ru.otus.homework.controller.dto.BookDto;
 import ru.otus.homework.model.Author;
 import ru.otus.homework.model.Book;
 import ru.otus.homework.model.Genre;
@@ -130,7 +131,7 @@ public class BookController {
                 .collect(Collectors.joining());
 
         model.addAttribute("bookId", book.getId());
-        model.addAttribute("bookDto", new BookDto(book.getFullName(), book.getGenre().getName(), authors, book.getBookDescription()));
+        model.addAttribute("bookDto", BookDto.toDto(book));
         return "update";
     }
 
@@ -142,7 +143,7 @@ public class BookController {
     ) {
         Genre newGenre = dictionaryService.getGenreByName(bookDto.getGenre());
         if (newGenre == null) {
-            BookDto newBookDto = new BookDto(bookDto.getFullname(), HAS_ERROR, bookDto.getAuthors(), bookDto.getDescription());
+            BookDto newBookDto = new BookDto(id, bookDto.getFullname(), HAS_ERROR, bookDto.getAuthors(), bookDto.getDescription());
             model.addAttribute("bookDto", newBookDto);
             model.addAttribute("bookId", id);
             return "update";
