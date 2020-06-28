@@ -1,3 +1,6 @@
+server:
+ port: 8080
+
 spring:
  datasource:
   platform: postgres
@@ -5,7 +8,6 @@ spring:
   username: postgres
   password: 1
   driverClassName: org.postgresql.Driver
-
  jpa:
   database-platform: org.hibernate.dialect.PostgreSQLDialect
   generate-ddl: false
@@ -15,8 +17,28 @@ spring:
    hibernate:
     temp.use_jdbc_metadata_defaults: false
   show-sql: true
+ data:
+  rest:
+   base-path: /datarest
+
+management:
+ endpoints:
+  web:
+   exposure:
+    include: health,metrics,logfile
+ endpoint:
+  health:
+   show-details: always
+  metrics:
+   enabled: true
+  logfile:
+   enabled: true
+ health:
+  defaults:
+   enabled: true
+
 logging:
  level:
-  root: ERROR
-server:
- port: 8080
+  root: INFO
+ file:
+  name: ./logs/spring-boot-logger.log

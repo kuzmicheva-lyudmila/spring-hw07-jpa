@@ -8,4 +8,5 @@ public interface PostService {
     Post insertPostByBook(long bookId, String description);
     boolean deletePostsByBook(long bookId);
     List<Post> getPostsByBook(long bookId);
+    Long getAveragePostCountOnBook();
 }
