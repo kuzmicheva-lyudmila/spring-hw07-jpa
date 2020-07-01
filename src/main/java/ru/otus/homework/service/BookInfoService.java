@@ -12,4 +12,5 @@ public interface BookInfoService {
     boolean deleteBookById(long bookId);
     List<Book> getAllBooks();
     Book getBookById(long bookId);
+    long getBookCount();
 }

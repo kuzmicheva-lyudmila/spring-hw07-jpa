@@ -98,6 +98,11 @@ public class BookInfoServiceImpl implements BookInfoService {
         return optionalBook.orElse(null);
     }
 
+    @Override
+    public long getBookCount() {
+        return bookInfoRepositoryJpa.count();
+    }
+
     private List<Author> formAuthorList(String authorFullNames) {
         List<Author> authors = dictionaryService.getAuthors();
 

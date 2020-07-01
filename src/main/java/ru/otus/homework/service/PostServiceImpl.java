@@ -67,4 +67,19 @@ public class PostServiceImpl implements PostService {
             return Collections.emptyList();
         }
     }
+
+    @Override
+    public Long getAveragePostCountOnBook() {
+        long bookCount = bookInfoService.getBookCount();
+        if (bookCount == 0) {
+            return null;
+        }
+
+        long postCount = postRepositoryJpa.count();
+        if (postCount == 0) {
+            return 0L;
+        }
+
+        return postCount / bookCount;
+    }
 }
