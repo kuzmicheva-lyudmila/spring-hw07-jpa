@@ -58,16 +58,6 @@ class BookInfoServiceImplTest {
 
     @SneakyThrows
     @Test
-    void updateTitleBookById() {
-        when(bookInfoRepositoryJpa.findById(anyLong())).thenReturn(Optional.of(new Book()));
-        bookInfoService.updateTitleBookById(BOOK_ID, BOOK_NEW_TITLE);
-
-        verify(bookInfoRepositoryJpa, times(1)).findById(BOOK_ID);
-        verify(bookInfoRepositoryJpa, times(1)).save(any());
-    }
-
-    @SneakyThrows
-    @Test
     void deleteBookById() {
         when(bookInfoRepositoryJpa.findById(anyLong())).thenReturn(Optional.of(new Book()));
         bookInfoService.deleteBookById(BOOK_ID);

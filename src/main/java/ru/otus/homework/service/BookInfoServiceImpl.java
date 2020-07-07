@@ -1,6 +1,6 @@
 package ru.otus.homework.service;
 
-import lombok.SneakyThrows;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.otus.homework.model.Author;
@@ -10,6 +10,7 @@ import ru.otus.homework.repository.BookInfoRepositoryJpa;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,7 +32,7 @@ public class BookInfoServiceImpl implements BookInfoService {
         this.dictionaryService = dictionaryService;
     }
 
-    @SneakyThrows
+    @HystrixCommand(commandKey="insertBook")
     @Override
     public Book insertBook(String title, String authors, String genreName, String description) {
         List<Author> authorList = formAuthorList(authors);
@@ -45,17 +46,7 @@ public class BookInfoServiceImpl implements BookInfoService {
         return null;
     }
 
-    @SneakyThrows
-    @Override
-    public Book updateTitleBookById(long bookId, String newBookTitle) {
-        Book updatedBook = getBookById(bookId);
-        if (updatedBook != null) {
-            updatedBook.setFullName(newBookTitle);
-            return updateBook(updatedBook);
-        }
-        return null;
-    }
-
+    @HystrixCommand(commandKey="updateBook")
     @Override
     public Book updateBookById(long bookId, String bookTitle, String authors, Genre genre, String description) {
         List<Author> authorList = formAuthorList(authors);
@@ -70,7 +61,7 @@ public class BookInfoServiceImpl implements BookInfoService {
         return null;
     }
 
-    @SneakyThrows
+    @HystrixCommand(commandKey="deleteBook")
     @Override
     public boolean deleteBookById(long bookId) {
         try {
@@ -85,22 +76,35 @@ public class BookInfoServiceImpl implements BookInfoService {
         return false;
     }
 
-    @SneakyThrows
+    @HystrixCommand(commandKey="getBooks", fallbackMethod="buildFallbackBookList")
     @Override
     public List<Book> getAllBooks() {
         return bookInfoRepositoryJpa.findAll();
     }
 
-    @SneakyThrows
+    public List<Book> buildFallbackBookList() {
+        return Collections.emptyList();
+    }
+
+    @HystrixCommand(commandKey="getBookById", fallbackMethod="buildFallbackBook")
     @Override
     public Book getBookById(long bookId) {
         Optional<Book> optionalBook = bookInfoRepositoryJpa.findById(bookId);
         return optionalBook.orElse(null);
     }
 
+    public Book buildFallbackBook(long bookId) {
+        return null;
+    }
+
+    @HystrixCommand(commandKey="getBookCount", fallbackMethod="buildFallbackBookCount")
     @Override
     public long getBookCount() {
         return bookInfoRepositoryJpa.count();
+    }
+
+    public long buildFallbackBookCount() {
+        return 0;
     }
 
     private List<Author> formAuthorList(String authorFullNames) {

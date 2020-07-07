@@ -1,6 +1,6 @@
 package ru.otus.homework.service;
 
-import lombok.SneakyThrows;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import org.springframework.stereotype.Service;
 import ru.otus.homework.model.Author;
 import ru.otus.homework.model.Genre;
@@ -9,7 +9,6 @@ import ru.otus.homework.repository.AuthorRepositoryJpa;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class DictionaryServiceImpl implements DictionaryService {
@@ -25,39 +24,29 @@ public class DictionaryServiceImpl implements DictionaryService {
         this.genreRepositoryJpa = genreRepositoryJpa;
     }
 
-    @SneakyThrows
+    @HystrixCommand(commandKey="getAuthors", fallbackMethod="buildFallbackAuthors")
     @Override
     public List<Author> getAuthors() {
         return authorRepositoryJpa.findAll();
      }
 
-    @SneakyThrows
+    @HystrixCommand(commandKey="saveAuthor")
     @Override
     public Author saveAuthor(Author author) {
         return authorRepositoryJpa.save(author);
     }
 
-    @SneakyThrows
-    @Override
-    public List<Genre> getGenres() {
-        return genreRepositoryJpa.findAll();
-    }
-
-    @SneakyThrows
-    @Override
-    public List<String> getGenreNames() {
-        List<Genre> genres = getGenres();
-        if (!genres.isEmpty()) {
-            return genres.stream()
-                    .map(Genre::getGenre)
-                    .collect(Collectors.toList());
-        }
-        return Collections.emptyList();
-    }
-
-    @SneakyThrows
+    @HystrixCommand(commandKey="getGenre", fallbackMethod="buildFallbackGenre")
     @Override
     public Genre getGenreByName(String genre) {
         return genreRepositoryJpa.findByGenre(genre);
+    }
+
+    public List<Author> buildFallbackAuthors() {
+        return Collections.emptyList();
+    }
+
+    public Genre buildFallbackGenre(String genre) {
+        return null;
     }
 }
