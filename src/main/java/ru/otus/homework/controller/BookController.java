@@ -40,7 +40,12 @@ public class BookController {
         this.dictionaryService = dictionaryService;
     }
 
-    @GetMapping({"/", "/list"})
+    @GetMapping("/")
+    public String mainPage(Model model) {
+        return "index";
+    }
+
+    @GetMapping("/list")
     public String listBooks(Model model) {
         List<Book> books = bookInfoService.getAllBooks();
         model.addAttribute("books", books);
@@ -157,5 +162,16 @@ public class BookController {
         );
         model.clear();
         return "redirect:/list";
+    }
+
+    @GetMapping("/login")
+    public String login() {
+        return "login";
+    }
+
+    @GetMapping("/login-error")
+    public String loginError(Model model) {
+        model.addAttribute("loginError", true);
+        return "login";
     }
 }

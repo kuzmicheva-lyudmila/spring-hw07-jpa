@@ -39,10 +39,12 @@ class ControllerAnswer {
             "        </tbody>\r\n" +
             "    </table>\r\n" +
             "\r\n" +
-            "    <div class=\"row\">\r\n" +
-            "        <a href=\"/add\">Add book</a>\r\n" +
-            "    </div>\r\n" +
-            "\r\n" +
+            "    <form action=\"/add\" method=\"get\">\r\n" +
+            "        <input type=\"submit\" value=\"Add book\"/>\r\n" +
+            "    </form>\r\n" +
+            "    <form action=\"/logout\" method=\"post\">\r\n" +
+            "        <input type=\"submit\" value=\"Sign Out\"/>\r\n" +
+            "    </form>\r\n" +
             "</body>\r\n" +
-            "</html>";
+            "</html>\r\n";
 }

@@ -14,3 +14,6 @@ values ('the book1', 2, 'description'),
 
 insert into posts (book_id, description)
 values (1, 'description1'), (1, 'description2'), (1, 'description3');
+
+insert into users (user_name, active)
+values ('user', true);

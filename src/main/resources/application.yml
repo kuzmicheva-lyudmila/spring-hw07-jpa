@@ -6,7 +6,7 @@ spring:
   platform: postgres
   url: jdbc:postgresql://localhost:5432/postgres?currentSchema=library
   username: postgres
-  password: 1
+  password: postgres
   driverClassName: org.postgresql.Driver
  jpa:
   database-platform: org.hibernate.dialect.PostgreSQLDialect
