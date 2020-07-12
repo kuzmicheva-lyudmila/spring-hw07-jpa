@@ -44,10 +44,4 @@ public class DictionaryServiceImplTest {
         dictionaryService.getAuthors();
         verify(authorRepositoryJpa, times(1)).findAll();
     }
-
-    @Test
-    void getBookGenres() {
-        dictionaryService.getGenres();
-        verify(genreRepositoryJpa, times(1)).findAll();
-    }
 }

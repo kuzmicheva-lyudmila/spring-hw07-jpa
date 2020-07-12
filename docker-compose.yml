@@ -17,7 +17,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/postgres?currentSchema=library
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: 1
-      SPRING_FLYWAY_ENABLED: False
+      SPRING_FLYWAY_ENABLED: 'false'
     build: .
     ports:
       - 8080:8080

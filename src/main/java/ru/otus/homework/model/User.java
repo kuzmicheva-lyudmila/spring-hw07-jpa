@@ -26,4 +26,7 @@ public class User {
 
     @Column
     private boolean active;
+
+    @Column
+    private String roles;
 }
