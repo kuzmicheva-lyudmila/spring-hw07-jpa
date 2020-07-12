@@ -1,4 +1,4 @@
-CREATE SCHEMA IF NOT EXISTS library;
+create schema IF NOT EXISTS library;
 
 create table IF NOT EXISTS library.authors (
     id bigserial Primary Key,
