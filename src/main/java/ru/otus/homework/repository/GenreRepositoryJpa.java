@@ -1,11 +1,11 @@
 package ru.otus.homework.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.security.access.prepost.PostAuthorize;
 import ru.otus.homework.model.Genre;
 
-import java.util.List;
-
 public interface GenreRepositoryJpa extends JpaRepository<Genre, Long> {
-    List<Genre> findAll();
+
+    @PostAuthorize("hasPermission(returnObject, 'WRITE')")
     Genre findByGenre(String genre);
 }

@@ -1,12 +1,13 @@
 package ru.otus.homework.service;
 
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import ru.otus.homework.model.Author;
 import ru.otus.homework.model.Book;
 import ru.otus.homework.model.Genre;
 import ru.otus.homework.repository.BookInfoRepositoryJpa;
+import ru.otus.homework.security.annotation.IsEditor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,8 +32,8 @@ public class BookInfoServiceImpl implements BookInfoService {
         this.dictionaryService = dictionaryService;
     }
 
-    @SneakyThrows
     @Override
+    @IsEditor
     public Book insertBook(String title, String authors, String genreName, String description) {
         List<Author> authorList = formAuthorList(authors);
         Genre genre = dictionaryService.getGenreByName(genreName);
@@ -45,18 +46,8 @@ public class BookInfoServiceImpl implements BookInfoService {
         return null;
     }
 
-    @SneakyThrows
     @Override
-    public Book updateTitleBookById(long bookId, String newBookTitle) {
-        Book updatedBook = getBookById(bookId);
-        if (updatedBook != null) {
-            updatedBook.setFullName(newBookTitle);
-            return updateBook(updatedBook);
-        }
-        return null;
-    }
-
-    @Override
+    @IsEditor
     public Book updateBookById(long bookId, String bookTitle, String authors, Genre genre, String description) {
         List<Author> authorList = formAuthorList(authors);
         Book updatedBook = getBookById(bookId);
@@ -70,8 +61,8 @@ public class BookInfoServiceImpl implements BookInfoService {
         return null;
     }
 
-    @SneakyThrows
     @Override
+    @PreAuthorize("hasRole('ROLE_EDITOR')")
     public boolean deleteBookById(long bookId) {
         try {
             Book book = getBookById(bookId);
@@ -85,20 +76,21 @@ public class BookInfoServiceImpl implements BookInfoService {
         return false;
     }
 
-    @SneakyThrows
     @Override
+    @PreAuthorize("hasRole('ROLE_VIEWER')")
     public List<Book> getAllBooks() {
         return bookInfoRepositoryJpa.findAll();
     }
 
-    @SneakyThrows
     @Override
+    @PreAuthorize("hasRole('ROLE_VIEWER')")
     public Book getBookById(long bookId) {
         Optional<Book> optionalBook = bookInfoRepositoryJpa.findById(bookId);
         return optionalBook.orElse(null);
     }
 
     @Override
+    @PreAuthorize("hasRole('ROLE_VIEWER')")
     public long getBookCount() {
         return bookInfoRepositoryJpa.count();
     }
