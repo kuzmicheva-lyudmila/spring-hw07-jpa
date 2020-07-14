@@ -1,6 +1,6 @@
 package ru.otus.homework.service;
 
-import lombok.SneakyThrows;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.otus.homework.model.Book;
@@ -25,7 +25,7 @@ public class PostServiceImpl implements PostService {
         this.postRepositoryJpa = postRepositoryJpa;
     }
 
-    @SneakyThrows
+    @HystrixCommand(commandKey="insertPostByBook")
     @Override
     public Post insertPostByBook(long bookId, String description) {
         try {
@@ -39,7 +39,7 @@ public class PostServiceImpl implements PostService {
         return null;
     }
 
-    @SneakyThrows
+    @HystrixCommand(commandKey="deletePostsByBook")
     @Override
     public boolean deletePostsByBook(long bookId) {
         try {
@@ -57,7 +57,7 @@ public class PostServiceImpl implements PostService {
         return false;
     }
 
-    @SneakyThrows
+    @HystrixCommand(commandKey="getPostsByBook", fallbackMethod="buildFallbackPostList")
     @Override
     public List<Post> getPostsByBook(long bookId) {
         Book book = bookInfoService.getBookById(bookId);
@@ -68,6 +68,11 @@ public class PostServiceImpl implements PostService {
         }
     }
 
+    public List<Post> buildFallbackPostList(long bookId) {
+        return Collections.emptyList();
+    }
+
+    @HystrixCommand(commandKey="getAveragePostCountOnBook", fallbackMethod="buildFallbackAveragePostCount")
     @Override
     public Long getAveragePostCountOnBook() {
         long bookCount = bookInfoService.getBookCount();
@@ -81,5 +86,9 @@ public class PostServiceImpl implements PostService {
         }
 
         return postCount / bookCount;
+    }
+
+    public Long buildFallbackAveragePostCount() {
+        return 0L;
     }
 }

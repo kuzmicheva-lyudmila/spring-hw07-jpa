@@ -1,5 +1,6 @@
 package ru.otus.homework.service;
 
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -11,6 +12,7 @@ import ru.otus.homework.security.annotation.IsEditor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,6 +34,7 @@ public class BookInfoServiceImpl implements BookInfoService {
         this.dictionaryService = dictionaryService;
     }
 
+    @HystrixCommand(commandKey="insertBook")
     @Override
     @IsEditor
     public Book insertBook(String title, String authors, String genreName, String description) {
@@ -46,6 +49,7 @@ public class BookInfoServiceImpl implements BookInfoService {
         return null;
     }
 
+    @HystrixCommand(commandKey="updateBook")
     @Override
     @IsEditor
     public Book updateBookById(long bookId, String bookTitle, String authors, Genre genre, String description) {
@@ -61,6 +65,7 @@ public class BookInfoServiceImpl implements BookInfoService {
         return null;
     }
 
+    @HystrixCommand(commandKey="deleteBook")
     @Override
     @PreAuthorize("hasRole('ROLE_EDITOR')")
     public boolean deleteBookById(long bookId) {
@@ -76,12 +81,18 @@ public class BookInfoServiceImpl implements BookInfoService {
         return false;
     }
 
+    @HystrixCommand(commandKey="getBooks", fallbackMethod="buildFallbackBookList")
     @Override
     @PreAuthorize("hasRole('ROLE_VIEWER')")
     public List<Book> getAllBooks() {
         return bookInfoRepositoryJpa.findAll();
     }
 
+    public List<Book> buildFallbackBookList() {
+        return Collections.emptyList();
+    }
+
+    @HystrixCommand(commandKey="getBookById", fallbackMethod="buildFallbackBook")
     @Override
     @PreAuthorize("hasRole('ROLE_VIEWER')")
     public Book getBookById(long bookId) {
@@ -89,10 +100,19 @@ public class BookInfoServiceImpl implements BookInfoService {
         return optionalBook.orElse(null);
     }
 
+    public Book buildFallbackBook(long bookId) {
+        return null;
+    }
+
+    @HystrixCommand(commandKey="getBookCount", fallbackMethod="buildFallbackBookCount")
     @Override
     @PreAuthorize("hasRole('ROLE_VIEWER')")
     public long getBookCount() {
         return bookInfoRepositoryJpa.count();
+    }
+
+    public long buildFallbackBookCount() {
+        return 0;
     }
 
     private List<Author> formAuthorList(String authorFullNames) {
