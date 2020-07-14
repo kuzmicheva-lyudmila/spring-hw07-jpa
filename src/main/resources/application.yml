@@ -19,6 +19,12 @@ spring:
    hibernate:
     temp.use_jdbc_metadata_defaults: false
   show-sql: true
+ flyway:
+  enabled: true
+  url: jdbc:postgresql://localhost:5432/postgres
+  user: postgres
+  password: postgres
+
  data:
   rest:
    base-path: /datarest

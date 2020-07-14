@@ -7,7 +7,6 @@ import ru.otus.homework.model.Genre;
 import ru.otus.homework.repository.GenreRepositoryJpa;
 import ru.otus.homework.repository.AuthorRepositoryJpa;
 
-import java.util.Collections;
 import java.util.List;
 
 @Service

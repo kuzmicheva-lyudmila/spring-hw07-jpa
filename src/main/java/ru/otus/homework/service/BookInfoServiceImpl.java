@@ -2,11 +2,13 @@ package ru.otus.homework.service;
 
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import ru.otus.homework.model.Author;
 import ru.otus.homework.model.Book;
 import ru.otus.homework.model.Genre;
 import ru.otus.homework.repository.BookInfoRepositoryJpa;
+import ru.otus.homework.security.annotation.IsEditor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,6 +36,7 @@ public class BookInfoServiceImpl implements BookInfoService {
 
     @HystrixCommand(commandKey="insertBook")
     @Override
+    @IsEditor
     public Book insertBook(String title, String authors, String genreName, String description) {
         List<Author> authorList = formAuthorList(authors);
         Genre genre = dictionaryService.getGenreByName(genreName);
@@ -48,6 +51,7 @@ public class BookInfoServiceImpl implements BookInfoService {
 
     @HystrixCommand(commandKey="updateBook")
     @Override
+    @IsEditor
     public Book updateBookById(long bookId, String bookTitle, String authors, Genre genre, String description) {
         List<Author> authorList = formAuthorList(authors);
         Book updatedBook = getBookById(bookId);
@@ -63,6 +67,7 @@ public class BookInfoServiceImpl implements BookInfoService {
 
     @HystrixCommand(commandKey="deleteBook")
     @Override
+    @PreAuthorize("hasRole('ROLE_EDITOR')")
     public boolean deleteBookById(long bookId) {
         try {
             Book book = getBookById(bookId);
@@ -78,6 +83,7 @@ public class BookInfoServiceImpl implements BookInfoService {
 
     @HystrixCommand(commandKey="getBooks", fallbackMethod="buildFallbackBookList")
     @Override
+    @PreAuthorize("hasRole('ROLE_VIEWER')")
     public List<Book> getAllBooks() {
         return bookInfoRepositoryJpa.findAll();
     }
@@ -88,6 +94,7 @@ public class BookInfoServiceImpl implements BookInfoService {
 
     @HystrixCommand(commandKey="getBookById", fallbackMethod="buildFallbackBook")
     @Override
+    @PreAuthorize("hasRole('ROLE_VIEWER')")
     public Book getBookById(long bookId) {
         Optional<Book> optionalBook = bookInfoRepositoryJpa.findById(bookId);
         return optionalBook.orElse(null);
@@ -99,6 +106,7 @@ public class BookInfoServiceImpl implements BookInfoService {
 
     @HystrixCommand(commandKey="getBookCount", fallbackMethod="buildFallbackBookCount")
     @Override
+    @PreAuthorize("hasRole('ROLE_VIEWER')")
     public long getBookCount() {
         return bookInfoRepositoryJpa.count();
     }

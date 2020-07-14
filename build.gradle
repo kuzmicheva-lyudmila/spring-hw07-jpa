@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '2.2.6.RELEASE'
     id 'io.spring.dependency-management' version '1.0.8.RELEASE'
+    id 'org.flywaydb.flyway' version '6.5.0'
 }
 
 test {
@@ -21,18 +22,26 @@ dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: '2.2.6.RELEASE'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.2.6.RELEASE'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-thymeleaf', version: '2.2.6.RELEASE'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '2.2.6.RELEASE'
     compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: '2.2.0.RELEASE'
     compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix-dashboard', version: '2.2.0.RELEASE'
     compile group: 'org.postgresql', name: 'postgresql', version: '42.2.8'
+    compile group: 'org.flywaydb', name: 'flyway-core', version: '6.5.0'
     compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
     compileOnly 'org.projectlombok:lombok:1.18.12'
     annotationProcessor 'org.projectlombok:lombok:1.18.12'
+
+    compile group: 'org.springframework.security', name: 'spring-security-acl', version: '5.3.3.RELEASE'
+    compile group: 'org.springframework', name: 'spring-context-support', version: '5.2.7.RELEASE'
+    compile 'net.sf.ehcache:ehcache-core:2.6.11'
 
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: '2.2.6.RELEASE'
     compile group: 'org.springframework.data', name: 'spring-data-rest-hal-browser', version: '3.3.1.RELEASE'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-rest', version: '2.2.6.RELEASE'
 
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.2.6.RELEASE'
+    testCompile group: 'org.springframework.security', name: 'spring-security-test', version: '5.1.4.RELEASE'
+
     testCompile group: 'com.h2database', name: 'h2', version: '1.4.200'
     testCompile 'org.projectlombok:lombok:1.18.12'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.12'
