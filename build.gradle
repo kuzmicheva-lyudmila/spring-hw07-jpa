@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '2.2.6.RELEASE'
     id 'io.spring.dependency-management' version '1.0.8.RELEASE'
+    id 'org.flywaydb.flyway' version '6.5.0'
 }
 
 test {
@@ -21,7 +22,9 @@ dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: '2.2.6.RELEASE'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.2.6.RELEASE'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-thymeleaf', version: '2.2.6.RELEASE'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '2.2.6.RELEASE'
     compile group: 'org.postgresql', name: 'postgresql', version: '42.2.8'
+    compile group: 'org.flywaydb', name: 'flyway-core', version: '6.5.0'
     compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
     compileOnly 'org.projectlombok:lombok:1.18.12'
     annotationProcessor 'org.projectlombok:lombok:1.18.12'
@@ -31,6 +34,8 @@ dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-rest', version: '2.2.6.RELEASE'
 
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.2.6.RELEASE'
+    testCompile group: 'org.springframework.security', name: 'spring-security-test', version: '5.1.4.RELEASE'
+
     testCompile group: 'com.h2database', name: 'h2', version: '1.4.200'
     testCompile 'org.projectlombok:lombok:1.18.12'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.12'

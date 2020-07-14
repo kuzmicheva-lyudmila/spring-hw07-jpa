@@ -36,9 +36,11 @@
         </tbody>
     </table>
 
-    <div class="row">
-        <a th:href="@{/add}" href="add.html">Add book</a>
-    </div>
-
+    <form th:action="@{/add}" method="get">
+        <input type="submit" value="Add book"/>
+    </form>
+    <form th:action="@{/logout}" method="post">
+        <input type="submit" value="Sign Out"/>
+    </form>
 </body>
 </html>

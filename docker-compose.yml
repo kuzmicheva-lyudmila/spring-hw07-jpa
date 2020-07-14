@@ -15,6 +15,9 @@ services:
     container_name: spring-library
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/postgres?currentSchema=library
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 1
+      SPRING_FLYWAY_ENABLED: 'false'
     build: .
     ports:
       - 8080:8080
@@ -24,7 +27,7 @@ services:
     image: flyway/flyway
     command: -url=jdbc:postgresql://db:5432/postgres -user=postgres -password=1 -connectRetries=60 migrate
     volumes:
-      - .:/flyway/sql
+      - ./src/main/resources/db/migration:/flyway/sql
     depends_on:
       - app
 volumes:
